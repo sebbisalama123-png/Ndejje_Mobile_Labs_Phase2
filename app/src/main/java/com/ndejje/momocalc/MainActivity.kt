@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -48,15 +49,44 @@ fun InternalStateInput() {
     )
 }
 
-@Preview(showBackground = true)
 @Composable
-fun BrokenInputPreview() {
-    BrokenInput()
+fun HoistedAmountInput(
+    amount: String,                    // allows state flows in
+    onAmountChange: (String) -> Unit,  // events flow out
+    isError: Boolean = false
+) {
+    Column {
+        TextField(
+            value = amount,
+            onValueChange = onAmountChange,
+            isError = isError,
+            label = { Text(stringResource(R.string.enter_amount)) }
+        )
+        if (isError) {
+            Text(
+                text = stringResource(R.string.error_numbers_only),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Empty State")
 @Composable
-fun InternalStateInputPreview() {
-    InternalStateInput()
+fun PreviewEmpty() {
+    HoistedAmountInput(amount = "", onAmountChange = {})
+}
+
+@Preview(showBackground = true, name = "Filled State")
+@Composable
+fun PreviewFilled() {
+    HoistedAmountInput(amount = "50000", onAmountChange = {})
+}
+
+@Preview(showBackground = true, name = "Error State")
+@Composable
+fun PreviewError() {
+    HoistedAmountInput(amount = "sebbi", onAmountChange = {}, isError = true)
 }
 
