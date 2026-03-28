@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun BrokenInput() {
-    var amount = "0"
+    var amount = ""
 
     TextField(
         value = amount,
@@ -36,9 +36,27 @@ fun BrokenInput() {
     )
 }
 
+@Composable
+fun InternalStateInput() {
+    // State is now properly tracked by Compose
+    var amount by remember { mutableStateOf("500") }
+
+    TextField(
+        value = amount,
+        onValueChange = { amount = it },
+        label = { Text(stringResource(R.string.enter_amount)) }
+    )
+}
+
 @Preview(showBackground = true)
 @Composable
 fun BrokenInputPreview() {
     BrokenInput()
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InternalStateInputPreview() {
+    InternalStateInput()
 }
 
