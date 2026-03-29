@@ -91,17 +91,27 @@ fun MoMoCalcScreen() {
 fun HoistedAmountInput(
     amount: String,
     onAmountChange: (String) -> Unit,
-    isError: Boolean
+    isError: Boolean = false,
+    modifier: Modifier = Modifier   // ← new parameter with safe default
 ) {
+    Column(modifier = modifier) {        // ← modifier applied to outer Column
     OutlinedTextField(
         value = amount,
         onValueChange = onAmountChange,
-        label = { Text("Enter Amount") },
+        label = { Text(stringResource(R.string.enter_amount))},
         isError = isError,
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         singleLine = true
     )
+        if (isError) {
+            Text(
+                text = stringResource(R.string.error_numbers_only),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)
