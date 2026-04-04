@@ -51,11 +51,19 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MoMoCalcScreen() {
+    //state to the input initialized as empty
     var amountInput by remember { mutableStateOf("") }
-
+    //convert input to double safely
     val numericAmount = amountInput.toDoubleOrNull()
+    //error state: true if not empty but not a valid number
     val isError = amountInput.isNotEmpty() && numericAmount == null
-    val fee = (numericAmount ?: 0.0) * 0.03
+    //calculate a 3% and 1.5% fee (if null/error, treat as 0.0)
+    val fee = if ((numericAmount ?: 0.0) < 2500000) {
+        (numericAmount ?: 0.0) * 0.03
+    } else {
+        (numericAmount ?: 0.0) * 0.015
+    }
+    //Format to UGX with thousand separators
     val formattedFee = "UGX %,.0f".format(fee)
 
     Column(
@@ -74,7 +82,7 @@ fun MoMoCalcScreen() {
 
         HoistedAmountInput(
             amount = amountInput,
-            onAmountChange = { amountInput = it },
+            onAmountChange = { amountInput = it },//This called a lambda
             isError = isError
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -90,8 +98,8 @@ fun MoMoCalcScreen() {
 // This function was missing from your original code
 @Composable
 fun HoistedAmountInput(
-    amount: String,
-    onAmountChange: (String) -> Unit,
+    amount: String,//allows state to flow in
+    onAmountChange: (String) -> Unit,//allows events to flow out
     isError: Boolean = false,
     modifier: Modifier = Modifier   // ← new parameter with safe default
 ) {
