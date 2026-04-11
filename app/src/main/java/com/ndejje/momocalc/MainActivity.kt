@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import com.ndejje.momocalc.ui.MoMoAppTheme
 import com.ndejje.momocalc.ui.theme.MoMoTypography
 
 class MainActivity : ComponentActivity() {
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MaterialTheme(typography = MoMoTypography) {
+            MoMoAppTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     Scaffold(
                         topBar = { MoMoTopBar() }
