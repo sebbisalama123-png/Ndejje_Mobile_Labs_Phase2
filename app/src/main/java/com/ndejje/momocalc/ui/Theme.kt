@@ -4,8 +4,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.ndejje.momocalc.ui.theme.MoMoTypography
-
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.foundation.isSystemInDarkTheme
 
 private val DarkColorScheme = darkColorScheme(
     primary         = BrandGold,        // gold becomes the hero in dark mode
@@ -34,13 +34,15 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun MoMoAppTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(), // auto-detect by default
     content: @Composable () -> Unit
 ) {
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
-        colorScheme = LightColorScheme,
-        typography  = MoMoTypography,   // from Module 5 Typography.kt
-        shapes      = MoMoShapes,        // from Part D below
+        colorScheme = colorScheme,
+        typography  = MoMoTypography,
+        shapes      = MoMoShapes,
         content     = content
     )
 }
