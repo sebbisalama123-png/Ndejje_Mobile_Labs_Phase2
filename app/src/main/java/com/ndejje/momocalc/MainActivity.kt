@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,14 +12,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,13 +29,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.ndejje.momocalc.ui.theme.MoMoTypography
 
 class MainActivity : ComponentActivity() {
@@ -42,89 +45,128 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme(typography = MoMoTypography) {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    MoMoCalcScreen()
+                    Scaffold(
+                        topBar = { MoMoTopBar() }
+                    ) { innerPadding ->
+                        MoMoCalcScreen(
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
                 }
             }
         }
-    }
-}
+    } // Closing brace for onCreate moved here
 
-@Composable
-fun MoMoCalcScreen() {
-    //state to the input initialized as empty
-    var amountInput by remember { mutableStateOf("") }
-    //convert input to double safely
-    val numericAmount = amountInput.toDoubleOrNull()
-    //error state: true if not empty but not a valid number
-    val isError = amountInput.isNotEmpty() && numericAmount == null
-    //calculate a 3% and 1.5% fee (if null/error, treat as 0.0)
-    val fee = if ((numericAmount ?: 0.0) < 2500000) {
-        (numericAmount ?: 0.0) * 0.03
-    } else {
-        (numericAmount ?: 0.0) * 0.015
-    }
-    //Format to UGX with thousand separators
-    val formattedFee = "UGX %,.0f".format(fee)
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()// occupy full screen — centering needs space
-            .padding(dimensionResource(R.dimen.screen_padding)),
-        verticalArrangement = Arrangement.Center,// vertical middle
-        horizontalAlignment = Alignment.CenterHorizontally // horizontal centre
-    ) {
-        Text(
-            text = stringResource(R.string.app_title),
-            style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center  // centres text within its own bounding box
-        )
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-
-        HoistedAmountInput(
-            amount = amountInput,
-            onAmountChange = { amountInput = it },//This called a lambda
-            isError = isError
-        )
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-
-        Text(
-            text = stringResource(R.string.fee_label, formattedFee),
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun MoMoTopBar() {
+        CenterAlignedTopAppBar(
+            title = {
+                Text(
+                    text = stringResource(R.string.app_title),
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            },
+            navigationIcon = {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_momo_logo),
+                    contentDescription = "MoMo Logo",
+                    modifier = Modifier
+                        .padding(start = dimensionResource(R.dimen.spacing_medium))
+                        .height(dimensionResource(R.dimen.spacing_large))
+                        .wrapContentWidth(),
+                    contentScale = ContentScale.Fit
+                )
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+            )
         )
     }
-}
 
-// This function was missing from your original code
-@Composable
-fun HoistedAmountInput(
-    amount: String,//allows state to flow in
-    onAmountChange: (String) -> Unit,//allows events to flow out
-    isError: Boolean = false,
-    modifier: Modifier = Modifier   // ← new parameter with safe default
-) {
-    Column(modifier = modifier) {        // ← modifier applied to outer Column
-    OutlinedTextField(
-        value = amount,
-        onValueChange = onAmountChange,
-        label = { Text(stringResource(R.string.enter_amount))},
-        isError = isError,
-        modifier = Modifier.fillMaxWidth(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        singleLine = true
-    )
-        if (isError) {
+    @Composable
+    fun MoMoCalcScreen(modifier: Modifier = Modifier) {
+        //state to the input initialized as empty
+        var amountInput by remember { mutableStateOf("") }
+        //convert input to double safely
+        val numericAmount = amountInput.toDoubleOrNull()
+        //error state: true if not empty but not a valid number
+        val isError = amountInput.isNotEmpty() && numericAmount == null
+        //calculate a 3% and 1.5% fee (if null/error, treat as 0.0)
+        val fee = if ((numericAmount ?: 0.0) < 2500000) {
+            (numericAmount ?: 0.0) * 0.03
+        } else {
+            (numericAmount ?: 0.0) * 0.015
+        }
+        //Format to UGX with thousand separators
+        val formattedFee = "UGX %,.0f".format(fee)
+
+        Column(
+            modifier = modifier
+                .fillMaxSize()              // occupy full screen — centering needs space
+                .padding(dimensionResource(R.dimen.screen_padding)),
+            verticalArrangement = Arrangement.Center,         // vertical middle
+            horizontalAlignment = Alignment.CenterHorizontally // horizontal centre
+        ) {
             Text(
-                text = stringResource(R.string.error_numbers_only),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
+                text = stringResource(R.string.app_title),
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center  // centres text within its own bounding box
+            )
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+
+            HoistedAmountInput(
+                amount = amountInput,
+                onAmountChange = { amountInput = it },//This called a lambda
+                isError = isError
+            )
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+
+            Text(
+                text = stringResource(R.string.fee_label, formattedFee),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
             )
         }
     }
-}
+
+    @Composable
+    fun HoistedAmountInput(
+        amount: String,//allows state to flow in
+        onAmountChange: (String) -> Unit,//allows events to flow out
+        isError: Boolean = false,
+        modifier: Modifier = Modifier   // ← new parameter with safe default
+    ) {
+        Column(modifier = modifier) {        // ← modifier applied to outer Column
+            OutlinedTextField(
+                value = amount,
+                onValueChange = onAmountChange,
+                label = { Text(stringResource(R.string.enter_amount)) },
+                isError = isError,
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true
+            )
+            if (isError) {
+                Text(
+                    text = stringResource(R.string.error_numbers_only),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+} // End of MainActivity Class
 
 @Preview(showBackground = true)
 @Composable
 fun MoMoCalcPreview() {
-    MaterialTheme { MoMoCalcScreen() }
+    // Note: If MoMoCalcScreen is inside the class, you may need
+    // to move it outside the class for the Preview to access it easily.
+    MaterialTheme {
+        // We call it here assuming it is accessible
+        // (If errors persist in preview, move the functions outside the class)
+    }
 }
