@@ -59,8 +59,6 @@ class MainActivity : ComponentActivity() {
     }
 } // End of MainActivity Class
 
-// --- Composables moved outside the class so Previews can see them ---
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoMoTopBar() {
@@ -128,11 +126,20 @@ fun MoMoCalcScreen(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
-        Text(
-            text = stringResource(R.string.fee_label, formattedFee),
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
-        )
+        // --- ADDED STEP D3 HERE ---
+        // Wrapping the fee display in a themed, shaped Surface
+        Surface(
+            shape = MaterialTheme.shapes.medium, // Pulls the corner radius from your Shape.kt
+            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f), // Using a theme-aware color
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = stringResource(R.string.fee_label, formattedFee),
+                style = MaterialTheme.typography.headlineSmall, // Made slightly larger for visibility
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(dimensionResource(R.dimen.spacing_medium))
+            )
+        }
     }
 }
 
