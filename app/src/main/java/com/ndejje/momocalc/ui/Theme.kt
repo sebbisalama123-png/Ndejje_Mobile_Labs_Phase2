@@ -1,11 +1,14 @@
 package com.ndejje.momocalc.ui
 
+import android.content.res.Configuration
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import com.ndejje.momocalc.ui.theme.MoMoTypography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.tooling.preview.Preview
+
 
 private val DarkColorScheme = darkColorScheme(
     primary         = BrandGold,        // gold becomes the hero in dark mode
@@ -46,3 +49,4 @@ fun MoMoAppTheme(
         content     = content
     )
 }
+
